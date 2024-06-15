@@ -70,12 +70,12 @@ function Board({ xIsNext, squares, onPlay }) {
 // メイン関数
 export default function Game() {
 
-  // プレイヤーのターンを管理するためのstate変数
-  const [xIsNext, setXIsNext] = useState(true);
   // historyはマス目全体の状態を管理する配列を要素とする配列 
   const [history, setHistory] = useState([Array(9).fill(null)]);
   // 現在見ているのが何手目かを管理するstate変数
   const [currentMove, setCurrentMove] = useState(0);
+  // プレイヤーのターンを管理するための変数、現在の手数が偶数か奇数かで判定
+  const xIsNext = currentMove % 2 === 0;
   // 現在選択されている着手をレンダー
   const currentSquares = history[currentMove];
 
@@ -85,14 +85,11 @@ export default function Game() {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
     setHistory(nextHistory);
     setCurrentMove(nextHistory.length - 1);
-    // プレイヤー交代
-    setXIsNext(!xIsNext);
   }
 
   // 履歴をクリックした時に, currentMoveとxIsNextを更新
   function jumpTo(nextMove) {
     setCurrentMove(nextMove);
-    setXIsNext(nextMove % 2 === 0);
   }
 
   // 履歴の各要素に対して、ボタンを生成　moveには配列のインデックスが渡される
