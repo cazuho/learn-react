@@ -1,6 +1,24 @@
+import { useState } from "react";
+
 // ボードの各マス目を表すコンポーネント
-function Square({ value }) {
-  return <button className="square">{value}</button>;
+function Square() {
+
+  // マス目の状態を記憶するためにuseStateを使う
+  const [value, setValue] = useState(null);
+
+  function handleClick() {
+    // マスをクリックするとvalueを'X'に変更する
+    setValue('X');
+  }
+
+  return (
+    <button
+      className="square"
+      onClick={handleClick}
+    >
+      {value}
+    </button>
+  );
 }
 
 
@@ -10,20 +28,20 @@ export default function Board() {
   return (
     <>
       <div className="board-row">
-        {/* Squareコンポーネントを呼び出し、propsとしてvalueを渡す */}
-        <Square value="1"/>
-        <Square value="2"/>
-        <Square value="3"/>
+        {/* propsを受け取らなくなったので修正 */}
+        <Square />
+        <Square />
+        <Square />
       </div>
       <div className="board-row">
-        <Square value="4"/>
-        <Square value="5"/>
-        <Square value="6"/>
+        <Square />
+        <Square />
+        <Square />
       </div>
       <div className="board-row">
-        <Square value="7"/>
-        <Square value="8"/>
-        <Square value="9"/>
+        <Square />
+        <Square />
+        <Square />
       </div>
     </>
   );
