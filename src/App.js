@@ -15,16 +15,31 @@ function Square({ value, onSquareClick }) {
 // ゲーム盤を表示するメイン関数
 export default function Board() {
 
-  // マス目の状態をボード全体で管理するためここでstate 変数を宣言
+  // プレイヤーのターンを管理するためのstate変数 
+  const [xIsNext, setXIsNext] = useState(true);
+
+  // マス目の状態をボード全体で管理するためここでstate変数を宣言
   const [squares, setSquares] = useState(Array(9).fill(null));
 
   // マス目がクリックされた時の処理
   function handleClick(i) {
+
+    // 既に埋まっているマス目はクリックしても何もしない
+    if (squares[i]) {
+      return;
+    }
     // 配列をコピー
     const nextSquares = squares.slice();
-    nextSquares[i] = "X";
+    // 現プレイヤーに応じてマス目に値をセット
+    if (xIsNext) {
+      nextSquares[i] = "X";
+    } else {
+      nextSquares[i] = "O";
+    }
     // setSquares関数をコールしてstateの変更を通知、再レンダリング
     setSquares(nextSquares);
+    // プレイヤー交代
+    setXIsNext(!xIsNext);
   }
 
   // React コンポーネントから返される要素は、単一のJSX要素である必要があるので、 <></> で囲む
