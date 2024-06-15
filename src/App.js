@@ -24,8 +24,8 @@ export default function Board() {
   // マス目がクリックされた時の処理
   function handleClick(i) {
 
-    // 既に埋まっているマス目はクリックしても何もしない
-    if (squares[i]) {
+    // 勝者が決まっている場合も何もせず、既に埋まっているマス目はクリックしても何もしない
+    if (calculateWinner(squares) || squares[i]) {
       return;
     }
     // 配列をコピー
@@ -42,9 +42,20 @@ export default function Board() {
     setXIsNext(!xIsNext);
   }
 
+  const winner = calculateWinner(squares);
+  let status;
+  // 勝者が決まっている場合は勝者を表示、そうでない場合は次のプレイヤーを表示
+  if (winner) {
+    status = "Winner: " + winner;
+  } else {
+    status = "Next player: " + (xIsNext ? "X" : "O");
+  }
+
   // React コンポーネントから返される要素は、単一のJSX要素である必要があるので、 <></> で囲む
   return (
     <>
+      {/* 勝者が決まっている場合は勝者を表示、そうでない場合は次のプレイヤーを表示するステータス欄 */}
+      <div className="status">{status}</div>
       <div className="board-row">
         {/* 各Squareコンポーネントに状態とクリック処理を渡す */}
         <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
@@ -65,3 +76,25 @@ export default function Board() {
   );
 }
 
+// 勝利判定用関数
+function calculateWinner(squares) {
+  // ボードの縦横斜めのラインに対応するマス目のインデックス
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6]
+  ];
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i];
+    // マス目が入力済みかつ縦横斜めのライン上のマス目が全て同じ値の場合、その値（プレイヤー）を返す
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return squares[a];
+    }
+  }
+  return null;
+}
