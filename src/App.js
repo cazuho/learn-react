@@ -1,5 +1,8 @@
 import { useState } from "react";
 
+// ボードのサイズを定数で定義
+const BOARD_SIZE = 3;
+
 /* 
  * ボードの各マス目を表すコンポーネント
  * マス目の状態とクリック時の処理を行う関数を受け取る
@@ -47,22 +50,15 @@ function Board({ xIsNext, squares, onPlay }) {
     <>
       {/* 勝者が決まっている場合は勝者を表示、そうでない場合は次のプレイヤーを表示するステータス欄 */}
       <div className="status">{status}</div>
-      <div className="board-row">
-        {/* 各Squareコンポーネントに状態とクリック処理を渡す */}
-        <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
-        <Square value={squares[1]} onSquareClick={() => handleClick(1)} />
-        <Square value={squares[2]} onSquareClick={() => handleClick(2)} />
-      </div>
-      <div className="board-row">
-        <Square value={squares[3]} onSquareClick={() => handleClick(3)} />
-        <Square value={squares[4]} onSquareClick={() => handleClick(4)} />
-        <Square value={squares[5]} onSquareClick={() => handleClick(5)} />
-      </div>
-      <div className="board-row">
-        <Square value={squares[6]} onSquareClick={() => handleClick(6)} />
-        <Square value={squares[7]} onSquareClick={() => handleClick(7)} />
-        <Square value={squares[8]} onSquareClick={() => handleClick(8)} />
-      </div>
+      {/* 3x3のマス目を生成するためにハードコーディングしていたものを改良 */}
+      {Array(BOARD_SIZE).fill(0).map((_, i) => (
+        <div className="board-row">
+          {Array(BOARD_SIZE).fill(0).map((_, j) => (
+            // 各Squareコンポーネントに状態とクリック処理を渡す 
+            <Square value={squares[BOARD_SIZE * i + j]} onSquareClick={() => handleClick(BOARD_SIZE * i + j)} />
+          ))}
+        </div>
+      ))}
     </>
   );
 }
