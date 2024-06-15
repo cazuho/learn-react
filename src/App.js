@@ -12,14 +12,8 @@ function Square({ value, onSquareClick }) {
   );
 }
 
-// ゲーム盤を表示するメイン関数
-export default function Board() {
-
-  // プレイヤーのターンを管理するためのstate変数 
-  const [xIsNext, setXIsNext] = useState(true);
-
-  // マス目の状態をボード全体で管理するためここでstate変数を宣言
-  const [squares, setSquares] = useState(Array(9).fill(null));
+// ゲーム盤を表示するコンポーネント
+function Board({ xIsNext, squares, onPlay }) {
 
   // マス目がクリックされた時の処理
   function handleClick(i) {
@@ -36,19 +30,16 @@ export default function Board() {
     } else {
       nextSquares[i] = "O";
     }
-    // setSquares関数をコールしてstateの変更を通知、再レンダリング
-    setSquares(nextSquares);
-    // プレイヤー交代
-    setXIsNext(!xIsNext);
+    onPlay(nextSquares);
   }
 
   const winner = calculateWinner(squares);
   let status;
   // 勝者が決まっている場合は勝者を表示、そうでない場合は次のプレイヤーを表示
   if (winner) {
-    status = "Winner: " + winner;
+    status = "勝者: " + winner;
   } else {
-    status = "Next player: " + (xIsNext ? "X" : "O");
+    status = "次のプレイヤー: " + (xIsNext ? "X" : "O");
   }
 
   // React コンポーネントから返される要素は、単一のJSX要素である必要があるので、 <></> で囲む
@@ -73,6 +64,63 @@ export default function Board() {
         <Square value={squares[8]} onSquareClick={() => handleClick(8)} />
       </div>
     </>
+  );
+}
+
+// メイン関数
+export default function Game() {
+
+  // プレイヤーのターンを管理するためのstate変数
+  const [xIsNext, setXIsNext] = useState(true);
+  // historyはマス目全体の状態を管理する配列を要素とする配列 
+  const [history, setHistory] = useState([Array(9).fill(null)]);
+  // 現在見ているのが何手目かを管理するstate変数
+  const [currentMove, setCurrentMove] = useState(0);
+  // 現在選択されている着手をレンダー
+  const currentSquares = history[currentMove];
+
+  function handlePlay(nextSquares) {
+    // setHistory関数をコールしてstateの変更を通知、再レンダリング
+    // スプレッド構文を使用して、過去に戻ったところまでの履歴と現在の盤面を新しい配列としてhistoryにセット
+    const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
+    setHistory(nextHistory);
+    setCurrentMove(nextHistory.length - 1);
+    // プレイヤー交代
+    setXIsNext(!xIsNext);
+  }
+
+  // 履歴をクリックした時に, currentMoveとxIsNextを更新
+  function jumpTo(nextMove) {
+    setCurrentMove(nextMove);
+    setXIsNext(nextMove % 2 === 0);
+  }
+
+  // 履歴の各要素に対して、ボタンを生成　moveには配列のインデックスが渡される
+  const moves = history.map((squares, move) => {
+    let description;
+    if (move > 0) {
+      description = move + '手目に戻る';
+    } else {
+      description = 'ゲームの開始';
+    }
+    // 各リストアイテムにはkeyを設定することで、リストが変更された際にReactが効率的に再レンダリングできるようになる
+    return (
+      <li key={move}>
+        <button onClick={() => jumpTo(move)}>{description}</button>
+      </li>
+    );
+  });
+
+  return (
+    <div className="game">
+      <div className="game-board">
+        {/* Boardコンポーネントにプレイヤーとマス目の状態、state更新用の処理を渡す */}
+        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
+      </div>
+      <div className="game-info">
+        <ol>{moves}</ol>
+      </div>
+    </div>
   );
 }
 
